@@ -54,4 +54,29 @@ module.exports = class productController {
             res.status(500).json({ error: 'Internal Server Error' });
         }
     }
+
+    static async updateProduct(req, res) {
+        try {
+            const id = Number(req.params.id);
+            const { name, price, description } = req.body;
+            const result = await pool.query(
+                'UPDATE products SET name = $1, price = $2, description = $3 WHERE id = $4 RETURNING *',
+                [name, price, description, id]
+            );
+            if (result.rowCount === 0) {
+                return res.status(404).json({
+                    status: 'fail',
+                    message: 'Product not found'
+                });
+            }
+            res.status(200).json({
+                status: 'success',
+                message: 'Product updated successfully',
+                data: result.rows
+            });
+        } catch (error) {
+            console.error('Error updating product:', error);
+            res.status(500).json({ error: 'Internal Server Error' });
+        }
+    }
 }
