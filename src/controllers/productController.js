@@ -15,4 +15,25 @@ module.exports = class productController {
             res.status(500).json({ error: 'Internal Server Error' });
         }
     }
+
+    static async getProductById(req, res) {
+        try {
+            const id = Number(req.params.id);
+            const result = await pool.query('SELECT * FROM products WHERE id = $1', [id]);
+            if (result.rowCount === 0) {
+                return res.status(404).json({
+                    status: 'fail',
+                    message: 'Product not found'
+                });
+            }
+            res.status(200).json({
+                status: 'success',
+                message: 'Successfully fetched product',
+                data: result.rows
+            });
+        } catch (error) {
+            console.error('Error fetching product:', error);
+            res.status(500).json({ error: 'Internal Server Error' });
+        }
+    }
 }
