@@ -36,4 +36,22 @@ module.exports = class productController {
             res.status(500).json({ error: 'Internal Server Error' });
         }
     }
+
+    static async createProduct(req, res) {
+        try {
+            const { name, price, description } = req.body;
+            const result = await pool.query(
+                'INSERT INTO products (name, price, description) VALUES ($1, $2, $3) RETURNING *',
+                [name, price, description]
+            );
+            res.status(201).json({
+                status: 'success',
+                message: 'Product created successfully',
+                data: result.rows
+            });
+        } catch (error) {
+            console.error('Error creating product:', error);
+            res.status(500).json({ error: 'Internal Server Error' });
+        }
+    }
 }
