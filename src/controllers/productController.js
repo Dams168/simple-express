@@ -79,4 +79,25 @@ module.exports = class productController {
             res.status(500).json({ error: 'Internal Server Error' });
         }
     }
+
+    static async deleteProduct(req, res) {
+        try {
+            const id = Number(req.params.id);
+            const result = await pool.query('DELETE FROM products WHERE id = $1 RETURNING *', [id]);
+            if (result.rowCount === 0) {
+                return res.status(404).json({
+                    status: 'fail',
+                    message: 'Product not found'
+                });
+            }
+            res.status(200).json({
+                status: 'success',
+                message: 'Product deleted successfully',
+                data: result.rows
+            });
+        } catch (error) {
+            console.error('Error deleting product:', error);
+            res.status(500).json({ error: 'Internal Server Error' });
+        }
+    }
 }
